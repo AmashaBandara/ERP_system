@@ -1,7 +1,7 @@
 # Waikkal Hospitality ERP
 
 Integrated ERP for two businesses under one head office:
-- **Ernie's Retreat** – Waikkal Beach Villa (accommodation)XC
+- **Ernie's Retreat** – Waikkal Beach Villa (accommodation)
 - **Nanga's Kitchen** – Restaurant & catering (POS, online orders, catering)
 
 Monorepo with npm workspaces: `backend` (Express + TypeScript + Knex) and `frontend`
