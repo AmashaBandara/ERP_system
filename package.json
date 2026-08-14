@@ -1,0 +1,25 @@
+{
+  "name": "waikkal-hospitality-erp",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Integrated ERP for Ernie's Retreat (accommodation) and Nanga's Kitchen (restaurant & catering).",
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "dev": "concurrently -k -n backend,frontend -c blue,green \"npm:dev:backend\" \"npm:dev:frontend\"",
+    "dev:backend": "npm run dev --workspace backend",
+    "dev:frontend": "npm run dev --workspace frontend",
+    "build": "npm run build --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "db:migrate": "npm run db:migrate --workspace backend",
+    "db:seed": "npm run db:seed --workspace backend",
+    "db:setup": "npm run db:setup --workspace backend"
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.1"
+  }
+}

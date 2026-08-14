@@ -1,0 +1,103 @@
+-- 006_hr.sql
+CREATE TABLE employees (
+  id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  branch_id BIGINT UNSIGNED NOT NULL,
+  user_id BIGINT UNSIGNED NULL,
+  employee_code VARCHAR(40) NOT NULL,
+  first_name VARCHAR(80) NOT NULL,
+  last_name VARCHAR(80) NOT NULL,
+  nic VARCHAR(20) NULL,
+  dob DATE NULL,
+  gender ENUM('MALE','FEMALE','OTHER') NULL,
+  phone VARCHAR(40) NULL,
+  email VARCHAR(160) NULL,
+  address VARCHAR(255) NULL,
+  department VARCHAR(80) NULL,
+  designation VARCHAR(80) NULL,
+  employment_type VARCHAR(40) NULL,
+  join_date DATE NULL,
+  resign_date DATE NULL,
+  status ENUM('ACTIVE','INACTIVE','RESIGNED','TERMINATED') NOT NULL DEFAULT 'ACTIVE',
+  basic_salary DECIMAL(12,2) NOT NULL DEFAULT 0,
+  epf_no VARCHAR(40) NULL,
+  etf_no VARCHAR(40) NULL,
+  bank_name VARCHAR(80) NULL,
+  bank_branch VARCHAR(80) NULL,
+  account_no VARCHAR(40) NULL,
+  attendance_device_id VARCHAR(80) NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  UNIQUE KEY uq_emp_code (branch_id, employee_code),
+  INDEX idx_emp_status (branch_id, status),
+  CONSTRAINT fk_emp_branch FOREIGN KEY (branch_id) REFERENCES branches(id) ON DELETE CASCADE,
+  CONSTRAINT fk_emp_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+) DEFAULT CHARACTER SET utf8mb4;
+
+CREATE TABLE attendance (
+  id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  employee_id BIGINT UNSIGNED NOT NULL,
+  work_date DATE NOT NULL,
+  time_in TIMESTAMP NULL,
+  time_out TIMESTAMP NULL,
+  status ENUM('PRESENT','ABSENT','LEAVE','HOLIDAY') NOT NULL DEFAULT 'PRESENT',
+  method ENUM('FINGERPRINT','FACE','MANUAL') NOT NULL DEFAULT 'MANUAL',
+  overtime_minutes INT NOT NULL DEFAULT 0,
+  device_raw_json JSON NULL,
+  UNIQUE KEY uq_att (employee_id, work_date),
+  CONSTRAINT fk_att_emp FOREIGN KEY (employee_id) REFERENCES employees(id) ON DELETE CASCADE
+) DEFAULT CHARACTER SET utf8mb4;
+
+CREATE TABLE leave_requests (
+  id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  employee_id BIGINT UNSIGNED NOT NULL,
+  leave_type ENUM('ANNUAL','SICK','CASUAL','NO_PAY') NOT NULL,
+  from_date DATE NOT NULL,
+  to_date DATE NOT NULL,
+  days INT NOT NULL,
+  reason VARCHAR(255) NULL,
+  status ENUM('PENDING','APPROVED','REJECTED','CANCELLED') NOT NULL DEFAULT 'PENDING',
+  approved_by BIGINT UNSIGNED NULL,
+  approved_at TIMESTAMP NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX idx_lv_emp (employee_id, status),
+  CONSTRAINT fk_lv_emp FOREIGN KEY (employee_id) REFERENCES employees(id) ON DELETE CASCADE,
+  CONSTRAINT fk_lv_approvedby FOREIGN KEY (approved_by) REFERENCES users(id) ON DELETE SET NULL
+) DEFAULT CHARACTER SET utf8mb4;
+
+CREATE TABLE payroll (
+  id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  branch_id BIGINT UNSIGNED NOT NULL,
+  period_start DATE NOT NULL,
+  period_end DATE NOT NULL,
+  status ENUM('DRAFT','APPROVED','PAID') NOT NULL DEFAULT 'DRAFT',
+  total_gross DECIMAL(12,2) NOT NULL DEFAULT 0,
+  total_net DECIMAL(12,2) NOT NULL DEFAULT 0,
+  approved_by BIGINT UNSIGNED NULL,
+  paid_at TIMESTAMP NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX idx_payroll_status (branch_id, status),
+  CONSTRAINT fk_payroll_branch FOREIGN KEY (branch_id) REFERENCES branches(id) ON DELETE CASCADE,
+  CONSTRAINT fk_payroll_approvedby FOREIGN KEY (approved_by) REFERENCES users(id) ON DELETE SET NULL
+) DEFAULT CHARACTER SET utf8mb4;
+
+CREATE TABLE salary_details (
+  id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+  payroll_id BIGINT UNSIGNED NOT NULL,
+  employee_id BIGINT UNSIGNED NOT NULL,
+  basic_salary DECIMAL(12,2) NOT NULL DEFAULT 0,
+  allowances DECIMAL(12,2) NOT NULL DEFAULT 0,
+  overtime_pay DECIMAL(12,2) NOT NULL DEFAULT 0,
+  epf_employee DECIMAL(12,2) NOT NULL DEFAULT 0,
+  epf_employer DECIMAL(12,2) NOT NULL DEFAULT 0,
+  etf_employer DECIMAL(12,2) NOT NULL DEFAULT 0,
+  gross DECIMAL(12,2) NOT NULL DEFAULT 0,
+  deductions DECIMAL(12,2) NOT NULL DEFAULT 0,
+  net_pay DECIMAL(12,2) NOT NULL DEFAULT 0,
+  bank_name VARCHAR(80) NULL,
+  account_no VARCHAR(40) NULL,
+  UNIQUE KEY uq_sd (payroll_id, employee_id),
+  CONSTRAINT fk_sd_payroll FOREIGN KEY (payroll_id) REFERENCES payroll(id) ON DELETE CASCADE,
+  CONSTRAINT fk_sd_emp FOREIGN KEY (employee_id) REFERENCES employees(id) ON DELETE RESTRICT
+) DEFAULT CHARACTER SET utf8mb4;
