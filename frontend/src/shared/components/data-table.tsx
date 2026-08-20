@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { Download, Calendar } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/shared/components/ui/table';
 import { Spinner, EmptyState } from './common';
@@ -8,6 +9,13 @@ export interface Column<T> {
   header: string;
   render: (row: T) => React.ReactNode;
   className?: string;
+}
+
+export interface DateFilterConfig {
+  from?: string;
+  to?: string;
+  onFromChange?: (from: string) => void;
+  onToChange?: (to: string) => void;
 }
 
 interface DataTableProps<T> {
@@ -21,6 +29,9 @@ interface DataTableProps<T> {
   searchPlaceholder?: string;
   search?: string;
   onSearchChange?: (v: string) => void;
+  onExportCsv?: () => void;
+  exportLoading?: boolean;
+  dateFilter?: DateFilterConfig;
 }
 
 export function DataTable<T>({
@@ -34,21 +45,81 @@ export function DataTable<T>({
   search,
   onSearchChange,
   searchPlaceholder,
+  onExportCsv,
+  exportLoading,
+  dateFilter,
 }: DataTableProps<T>) {
   const totalPages = Math.max(1, Math.ceil(total / perPage));
+  const hasToolbar = (searchPlaceholder && onSearchChange) || dateFilter || onExportCsv;
 
   return (
     <div>
-      {searchPlaceholder && onSearchChange ? (
-        <div className="mb-4 max-w-sm">
-          <input
-            value={search ?? ''}
-            onChange={(e) => onSearchChange(e.target.value)}
-            placeholder={searchPlaceholder}
-            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          />
+      {hasToolbar ? (
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+          <div className="flex flex-wrap items-center gap-3">
+            {searchPlaceholder && onSearchChange ? (
+              <div className="w-full sm:w-64">
+                <input
+                  value={search ?? ''}
+                  onChange={(e) => onSearchChange(e.target.value)}
+                  placeholder={searchPlaceholder}
+                  className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                />
+              </div>
+            ) : null}
+
+            {dateFilter ? (
+              <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                <div className="flex items-center gap-1.5 rounded-md border border-input bg-background px-2.5 py-1">
+                  <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
+                  <span>From:</span>
+                  <input
+                    type="date"
+                    value={dateFilter.from ?? ''}
+                    onChange={(e) => dateFilter.onFromChange?.(e.target.value)}
+                    className="bg-transparent text-foreground focus:outline-none cursor-pointer"
+                  />
+                </div>
+                <div className="flex items-center gap-1.5 rounded-md border border-input bg-background px-2.5 py-1">
+                  <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
+                  <span>To:</span>
+                  <input
+                    type="date"
+                    value={dateFilter.to ?? ''}
+                    onChange={(e) => dateFilter.onToChange?.(e.target.value)}
+                    className="bg-transparent text-foreground focus:outline-none cursor-pointer"
+                  />
+                </div>
+                {dateFilter.from || dateFilter.to ? (
+                  <button
+                    onClick={() => {
+                      dateFilter.onFromChange?.('');
+                      dateFilter.onToChange?.('');
+                    }}
+                    className="text-xs text-primary hover:underline"
+                  >
+                    Clear dates
+                  </button>
+                ) : null}
+              </div>
+            ) : null}
+          </div>
+
+          {onExportCsv ? (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onExportCsv}
+              disabled={exportLoading || !data || data.length === 0}
+              className="flex items-center gap-2 text-xs"
+            >
+              <Download className="h-3.5 w-3.5" />
+              <span>Export CSV</span>
+            </Button>
+          ) : null}
         </div>
       ) : null}
+
       <div className="rounded-md border">
         <Table>
           <TableHeader>
