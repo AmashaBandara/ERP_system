@@ -74,6 +74,15 @@ router.get('/stats', async (_req: Request, res: Response, next: NextFunction) =>
       memoryHeapUsedMB: Math.round((memory.heapUsed / 1024 / 1024) * 100) / 100,
     };
 
+    interface BranchSummaryRow {
+      id: number | string;
+      name: string;
+      code: string;
+      type: string;
+      status: string;
+      user_count?: number | string;
+    }
+
     res.json({
       data: {
         counts: {
@@ -84,7 +93,7 @@ router.get('/stats', async (_req: Request, res: Response, next: NextFunction) =>
           todayAuditEvents: Number(todayAuditRow?.count ?? 0),
         },
         activityTrend,
-        branchSummary: branchSummary.map((b: any) => ({
+        branchSummary: (branchSummary as BranchSummaryRow[]).map((b) => ({
           id: Number(b.id),
           name: b.name,
           code: b.code,
