@@ -17,6 +17,7 @@ import roleRoutes from './modules/roles/routes';
 import branchRoutes from './modules/branches/routes';
 import auditRoutes from './modules/audit/routes';
 import healthRoutes from './modules/health/routes';
+import dashboardRoutes from './modules/dashboard/routes';
 
 export function createApp() {
   const app = express();
@@ -39,6 +40,7 @@ export function createApp() {
 
   app.use('/api/v1/health', healthRoutes);
   app.use('/api/v1/auth', authLimiter, authRoutes);
+  app.use('/api/v1/dashboard', apiLimiter, dashboardRoutes);
   app.use('/api/v1/users', apiLimiter, userRoutes);
   app.use('/api/v1/roles', apiLimiter, roleRoutes);
   app.use('/api/v1/branches', apiLimiter, branchRoutes);
