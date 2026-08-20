@@ -3,6 +3,7 @@ import { LayoutDashboard, Users, Shield, Building2, ScrollText, LogOut } from 'l
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/app/auth-store';
 import { useHasPermission } from '@/shared/hooks';
+import { ThemeToggle } from '@/shared/components/ui/ThemeToggle';
 
 interface NavItem {
   to: string;
@@ -65,6 +66,7 @@ export function AppShell() {
         <header className="flex h-16 items-center justify-between border-b px-6">
           <div />
           <div className="flex items-center gap-4">
+            <ThemeToggle />
             <div className="text-right">
               <p className="text-sm font-medium">{user?.full_name}</p>
               <p className="text-xs text-muted-foreground">{user?.roles?.map((r) => r.code).join(', ')}</p>

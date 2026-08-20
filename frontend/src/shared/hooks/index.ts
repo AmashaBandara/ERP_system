@@ -31,3 +31,6 @@ export function useHasPermission(permission: string): boolean {
   if (user.roles.some((r) => r.code === 'SUPER_ADMIN')) return true;
   return user.permissions?.includes(permission) ?? false;
 }
+
+export { useTheme, type Theme } from './useTheme';
+
