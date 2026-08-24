@@ -25,7 +25,7 @@ import {
 } from 'lucide-react';
 
 import { useAuthStore } from '@/app/auth-store';
-import { PageHeader } from '@/shared/components/common';
+import { PageHeader, Skeleton } from '@/shared/components/common';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
 import { Badge } from '@/shared/components/ui/badge';
 import { formatDateTime } from '@/lib/utils';
@@ -74,7 +74,7 @@ export function DashboardPage() {
       {/* KPI Cards Grid */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {/* Active Users */}
-        <Card className="relative overflow-hidden border transition-all hover:shadow-md">
+        <Card className="relative overflow-hidden border transition-all duration-200 hover:-translate-y-1 hover:shadow-lg before:absolute before:top-0 before:left-0 before:right-0 before:h-1 before:bg-gradient-to-r before:from-blue-500 before:to-indigo-500">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               Active Users
@@ -84,11 +84,17 @@ export function DashboardPage() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {isLoading ? '...' : counts.activeUsers}
-              <span className="text-xs font-normal text-muted-foreground ml-1.5">/ {counts.totalUsers} total</span>
+            <div className="text-2xl font-bold flex items-baseline">
+              {isLoading ? (
+                <Skeleton className="h-8 w-16 my-1" />
+              ) : (
+                <>
+                  {counts.activeUsers}
+                  <span className="text-xs font-normal text-muted-foreground ml-1.5">/ {counts.totalUsers} total</span>
+                </>
+              )}
             </div>
-            <p className="mt-1 text-xs text-muted-foreground flex items-center gap-1">
+            <p className="mt-1.5 text-xs text-muted-foreground flex items-center gap-1">
               <CheckCircle2 className="h-3 w-3 text-emerald-500" />
               <span>Accounts active in ERP</span>
             </p>
@@ -96,7 +102,7 @@ export function DashboardPage() {
         </Card>
 
         {/* Operating Branches */}
-        <Card className="relative overflow-hidden border transition-all hover:shadow-md">
+        <Card className="relative overflow-hidden border transition-all duration-200 hover:-translate-y-1 hover:shadow-lg before:absolute before:top-0 before:left-0 before:right-0 before:h-1 before:bg-gradient-to-r before:from-emerald-500 before:to-teal-500">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               Locations & Branches
@@ -106,8 +112,10 @@ export function DashboardPage() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{isLoading ? '...' : counts.totalBranches}</div>
-            <p className="mt-1 text-xs text-muted-foreground flex items-center gap-1">
+            <div className="text-2xl font-bold">
+              {isLoading ? <Skeleton className="h-8 w-12 my-1" /> : counts.totalBranches}
+            </div>
+            <p className="mt-1.5 text-xs text-muted-foreground flex items-center gap-1">
               <Layers className="h-3 w-3 text-primary" />
               <span>Ernie's Retreat & Nanga's Kitchen</span>
             </p>
@@ -115,7 +123,7 @@ export function DashboardPage() {
         </Card>
 
         {/* Security Roles */}
-        <Card className="relative overflow-hidden border transition-all hover:shadow-md">
+        <Card className="relative overflow-hidden border transition-all duration-200 hover:-translate-y-1 hover:shadow-lg before:absolute before:top-0 before:left-0 before:right-0 before:h-1 before:bg-gradient-to-r before:from-purple-500 before:to-pink-500">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               Security Roles
@@ -125,13 +133,15 @@ export function DashboardPage() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{isLoading ? '...' : counts.totalRoles}</div>
-            <p className="mt-1 text-xs text-muted-foreground">Enforced granular RBAC permissions</p>
+            <div className="text-2xl font-bold">
+              {isLoading ? <Skeleton className="h-8 w-12 my-1" /> : counts.totalRoles}
+            </div>
+            <p className="mt-1.5 text-xs text-muted-foreground">Enforced granular RBAC permissions</p>
           </CardContent>
         </Card>
 
         {/* Today Audit Events */}
-        <Card className="relative overflow-hidden border transition-all hover:shadow-md">
+        <Card className="relative overflow-hidden border transition-all duration-200 hover:-translate-y-1 hover:shadow-lg before:absolute before:top-0 before:left-0 before:right-0 before:h-1 before:bg-gradient-to-r before:from-amber-500 before:to-orange-500">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               Audit Events Today
@@ -141,8 +151,10 @@ export function DashboardPage() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{isLoading ? '...' : counts.todayAuditEvents}</div>
-            <p className="mt-1 text-xs text-muted-foreground flex items-center gap-1">
+            <div className="text-2xl font-bold">
+              {isLoading ? <Skeleton className="h-8 w-12 my-1" /> : counts.todayAuditEvents}
+            </div>
+            <p className="mt-1.5 text-xs text-muted-foreground flex items-center gap-1">
               <Clock className="h-3 w-3 text-amber-500" />
               <span>Recorded actions today</span>
             </p>

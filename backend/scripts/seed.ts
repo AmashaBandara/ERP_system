@@ -134,26 +134,46 @@ async function main(): Promise<void> {
   ];
   const branchIds = new Map<string, number>();
   for (const b of branchInfo) {
-    const r = await execQuery('INSERT INTO branches (code, name, type, address, phone, email, currency, timezone, status) VALUES (?,?,?,?,?,?,?,?,?)', [b.code, b.name, b.type, 'Beach Road, Waikkal', b.phone, `${b.code.toLowerCase()}@waikkalhospitality.lk`, 'LKR', 'Asia/Colombo', 'ACTIVE']);
-    branchIds.set(b.code, (r as { insertId: number }).insertId);
+    const existing = (await execQuery('SELECT id FROM branches WHERE code = ?', [b.code])) as Array<{ id: number }>;
+    let id: number;
+    if (existing.length > 0) {
+      id = existing[0].id;
+    } else {
+      const r = await execQuery('INSERT INTO branches (code, name, type, address, phone, email, currency, timezone, status) VALUES (?,?,?,?,?,?,?,?,?)', [b.code, b.name, b.type, 'Beach Road, Waikkal', b.phone, `${b.code.toLowerCase()}@waikkalhospitality.lk`, 'LKR', 'Asia/Colombo', 'ACTIVE']);
+      id = (r as { insertId: number }).insertId;
+    }
+    branchIds.set(b.code, id);
   }
 
   // permissions
   const permByKey = new Map<string, number>();
   for (const p of permissions) {
-    const r = await execQuery('INSERT INTO permissions (module, action, `key`, description) VALUES (?,?,?,?)', [p.module, p.action, p.key, p.description ?? null]);
-    permByKey.set(p.key, (r as { insertId: number }).insertId);
+    const existing = (await execQuery('SELECT id FROM permissions WHERE `key` = ?', [p.key])) as Array<{ id: number }>;
+    let id: number;
+    if (existing.length > 0) {
+      id = existing[0].id;
+    } else {
+      const r = await execQuery('INSERT INTO permissions (module, action, `key`, description) VALUES (?,?,?,?)', [p.module, p.action, p.key, p.description ?? null]);
+      id = (r as { insertId: number }).insertId;
+    }
+    permByKey.set(p.key, id);
   }
 
   // roles + role_permissions
   const roleIds = new Map<string, number>();
   for (const role of roles) {
-    const r = await execQuery('INSERT INTO roles (code, name, description, is_system) VALUES (?,?,?,?)', [role.code, role.name, role.description ?? null, role.is_system]);
-    const roleId = (r as { insertId: number }).insertId;
+    const existing = (await execQuery('SELECT id FROM roles WHERE code = ?', [role.code])) as Array<{ id: number }>;
+    let roleId: number;
+    if (existing.length > 0) {
+      roleId = existing[0].id;
+    } else {
+      const r = await execQuery('INSERT INTO roles (code, name, description, is_system) VALUES (?,?,?,?)', [role.code, role.name, role.description ?? null, role.is_system]);
+      roleId = (r as { insertId: number }).insertId;
+    }
     roleIds.set(role.code, roleId);
     for (const key of new Set(role.permissions)) {
       const permId = permByKey.get(key);
-      if (permId) await execQuery('INSERT INTO role_permissions (role_id, permission_id) VALUES (?,?)', [roleId, permId]);
+      if (permId) await execQuery('INSERT IGNORE INTO role_permissions (role_id, permission_id) VALUES (?,?)', [roleId, permId]);
     }
   }
 

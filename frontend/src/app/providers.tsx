@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { useEffect } from 'react';
 import { useAuthStore } from './auth-store';
 import { onAccessTokenChange } from '@/shared/api/client';
+import { ToastProvider } from '@/shared/components/ui/toast';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -21,5 +22,9 @@ export function AppProviders({ children }: { children: ReactNode }) {
     return off;
   }, [fetchMe]);
 
-  return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
+  return (
+    <QueryClientProvider client={queryClient}>
+      <ToastProvider>{children}</ToastProvider>
+    </QueryClientProvider>
+  );
 }

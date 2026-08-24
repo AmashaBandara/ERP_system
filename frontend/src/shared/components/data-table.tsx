@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Download, Calendar } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/shared/components/ui/table';
-import { Spinner, EmptyState } from './common';
+import { TableSkeleton, EmptyState } from './common';
 
 export interface Column<T> {
   key: string;
@@ -134,19 +134,33 @@ export function DataTable<T>({
           <TableBody>
             {loading ? (
               <TableRow>
-                <TableCell colSpan={columns.length} className="py-10 text-center">
-                  <Spinner className="mx-auto" />
+                <TableCell colSpan={columns.length} className="p-0">
+                  <TableSkeleton rows={5} columns={columns.length} />
                 </TableCell>
               </TableRow>
             ) : !data || data.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={columns.length}>
-                  <EmptyState />
+                  <EmptyState
+                    title="No records found"
+                    description={
+                      search
+                        ? `No results found for "${search}". Try checking for typos or searching another term.`
+                        : 'No records exist in this module yet.'
+                    }
+                    onReset={
+                      search && onSearchChange
+                        ? () => {
+                            onSearchChange('');
+                          }
+                        : undefined
+                    }
+                  />
                 </TableCell>
               </TableRow>
             ) : (
               data.map((row, i) => (
-                <TableRow key={i}>
+                <TableRow key={i} className="transition-colors hover:bg-muted/40">
                   {columns.map((c) => (
                     <TableCell key={c.key} className={c.className}>
                       {c.render(row)}

@@ -40,5 +40,20 @@ export function StatusBadge({ status }: { status: string }) {
     CANCELLED: 'destructive',
     CANCELLED_: 'destructive',
   };
-  return <Badge variant={map[status] ?? 'secondary'}>{status}</Badge>;
+
+  const variant = map[status] ?? 'secondary';
+
+  const dotColors = {
+    success: 'bg-emerald-500 shadow-emerald-500/50',
+    warning: 'bg-amber-500 shadow-amber-500/50',
+    destructive: 'bg-rose-500 shadow-rose-500/50',
+    secondary: 'bg-slate-400',
+  };
+
+  return (
+    <Badge variant={variant} className="gap-1.5 capitalize font-medium">
+      <span className={cn('h-1.5 w-1.5 rounded-full animate-pulse', dotColors[variant])} />
+      {status.toLowerCase()}
+    </Badge>
+  );
 }
